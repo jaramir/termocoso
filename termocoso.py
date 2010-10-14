@@ -18,6 +18,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import os
+
 import matplotlib
 matplotlib.use('GTK')
 
@@ -32,13 +34,15 @@ import matplotlib.collections
 import gtk
 gtk.gdk.threads_init()
 
-from lib import TermoStory
-from lib import TermoFeed
-from lib import TermoConfig
+from story import TermoStory
+from feed import TermoFeed
+from config import TermoConfig
 
 from switch import TermoSwitch
 
 import datetime
+
+builder_file = "/home/jaramir/termocoso/termocoso.xml"
 
 def fmt_temp( temp ):
     return "%.2f°C" % temp
@@ -58,11 +62,11 @@ graph_width = datetime.timedelta( hours=24 )
 graph_margin = datetime.timedelta( minutes=15 )
 
 class TermoGUI( object ):
-    def __init__( self ):
+    def __init__( self, basedir ):
         self.builder = gtk.Builder()
-        self.builder.add_from_file( "termocoso.xml" ) 
+        self.builder.add_from_file( builder_file ) 
         
-        self.config = TermoConfig( "config.db" )
+        self.config = TermoConfig( basedir + "config.db" )
         
         self.mode = self.config.get( "mode", default_mode )
         self.builder.get_object( "radio%s" % self.mode ).set_active( True )
@@ -84,7 +88,7 @@ class TermoGUI( object ):
         self.feed.start()
         
         # apre/crea lo storico
-        self.storico = TermoStory( "storico.db" )
+        self.storico = TermoStory( basedir + "storico.db" )
         
         # crea il grafico
         self.figure = Figure()
@@ -235,6 +239,10 @@ class TermoGUI( object ):
         self.feed.stop()
         gtk.main_quit()
 
-app = TermoGUI()
-gtk.main()
+if __name__ == "__main__":
+    base = os.getenv( "HOME" ) + "/.termocoso/"
+    if not os.path.exists( base ):
+        os.mkdir( base )
+    app = TermoGUI( base )
+    gtk.main()
 

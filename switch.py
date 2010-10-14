@@ -22,7 +22,7 @@ import socket
 import traceback
 import datetime
 
-safe = datetime.timedelta( seconds=30 )
+safe = datetime.timedelta( minutes=5 )
 
 remote = ( "10.0.0.10", 1200 )
 local = ( "10.0.0.100", 1200 )
@@ -35,10 +35,13 @@ timeout = 5
 
 class TermoSwitch( object ):
     def __init__( self ):
-        self.s = socket.socket( socket.AF_INET, socket.SOCK_DGRAM )
-        self.s.bind( local )
-        self.s.connect( remote )
-        self.s.settimeout( timeout )
+        try:
+            self.s = socket.socket( socket.AF_INET, socket.SOCK_DGRAM )
+            self.s.bind( local )
+            self.s.connect( remote )
+            self.s.settimeout( timeout )
+        except:
+            traceback.print_exc()
         
         # salva orario attuale (per evitare cambiamento alla partenza)
         self.last = datetime.datetime.now()

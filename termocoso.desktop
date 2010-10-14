@@ -1,0 +1,13 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Termocoso
+Comment=Un termostato programmabile
+GenericName=Termostato
+Exec=/home/jaramir/termocoso/termocoso.py
+Terminal=false
+X-MultipleArgs=false
+Type=Application
+Icon=/home/jaramir/termocoso/thermostat.png
+StartupWMClass=Termocoso
+StartupNotify=true
+
