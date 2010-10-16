@@ -23,13 +23,15 @@ import serial
 import struct
 import time
 import os.path
+import traceback
+import time
 
 device = "/dev/ttyUSB0"
 
 class TermoFeed( threading.Thread ):
     # il nostro termometro emette una lettura ogni secondo
     # ogni quanti letture vogliamo fare la media e generare un punto?
-    letture_per_punto = 10
+    letture_per_punto = 60
 
     def __init__( self, callback ):
         threading.Thread.__init__( self )
@@ -50,8 +52,11 @@ class TermoFeed( threading.Thread ):
         while not self.stopthread.isSet():
             # collegati al termometro
             if not self.ser and os.path.exists( device ):
-                self.ser = serial.Serial( device, 19200, timeout=1 )
-            
+                try:
+                    self.ser = serial.Serial( device, 19200, timeout=1 )
+                except:
+                    traceback.print_exc()
+
             # ritenta tra un secondo
             if not self.ser:                
                 time.sleep( 1 )

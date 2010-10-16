@@ -34,23 +34,28 @@ msg_set_off = "secret,t=0"
 timeout = 5
 
 class TermoSwitch( object ):
-    def __init__( self ):
-        try:
-            self.s = socket.socket( socket.AF_INET, socket.SOCK_DGRAM )
-            self.s.bind( local )
-            self.s.connect( remote )
-            self.s.settimeout( timeout )
-        except:
-            traceback.print_exc()
-        
+    def __init__( self ):        
         # salva orario attuale (per evitare cambiamento alla partenza)
         self.last = datetime.datetime.now()
+        self.s = None
+
+    def create_socket( self ):
+        self.s = socket.socket( socket.AF_INET, socket.SOCK_DGRAM )
+        self.s.bind( local )
+        self.s.connect( remote )
+        self.s.settimeout( timeout )
 
     def get_state( self ):
-        self.s.send( msg_get )
-        received = self.s.recv( 10 )
-        return received == "t=1"
-
+        try:
+            if not self.s:
+                self.create_socket()
+            self.s.send( msg_get )
+            received = self.s.recv( 10 )
+            return received == "t=1"
+        except:
+            traceback.print_exc()
+            return None
+            
     def set_state( self, state ):
         # non inviare se è inutile
         if self.get_state() == state:
@@ -61,8 +66,13 @@ class TermoSwitch( object ):
             return
             
         # invia messaggio e salva orario
-        msg = msg_set_on if state else msg_set_off
-        self.s.send( msg )
-        self.s.recv( 10 )
-        self.last = datetime.datetime.now()
+        try:
+            if not self.s:
+                self.create_socket()
+            msg = msg_set_on if state else msg_set_off
+            self.s.send( msg )
+            self.s.recv( 10 )
+            self.last = datetime.datetime.now()
+        except:
+            traceback.print_exc()
 

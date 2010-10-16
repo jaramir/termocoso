@@ -3,11 +3,11 @@ Encoding=UTF-8
 Name=Termocoso
 Comment=Un termostato programmabile
 GenericName=Termostato
-Exec=/home/jaramir/termocoso/termocoso.py
+Exec=termocoso.py
 Terminal=false
 X-MultipleArgs=false
 Type=Application
-Icon=/home/jaramir/termocoso/thermostat.png
+Icon=thermostat.png
 StartupWMClass=Termocoso
 StartupNotify=true
 

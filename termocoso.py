@@ -42,7 +42,13 @@ from switch import TermoSwitch
 
 import datetime
 
-builder_file = "/home/jaramir/termocoso/termocoso.xml"
+import sys
+prog = sys.argv[0]
+
+prefix = ""
+if "/" in prog:
+    prefix = "/".join( prog.split( "/" )[:-1] ) + "/"
+builder_file = prefix + "termocoso.xml"
 
 def fmt_temp( temp ):
     return "%.2f°C" % temp
@@ -81,6 +87,7 @@ class TermoGUI( object ):
         
         # collegati alla caldaia
         self.switch = TermoSwitch()
+        self.update_switch_ui()
     
         # crea il thread del termometro
         # specifica la callback
@@ -181,7 +188,10 @@ class TermoGUI( object ):
         """ leggi lo stato dello switch e aggiorna la UI
         """
         label = self.builder.get_object( "label_switch" )
-        if self.switch.get_state():
+        state = self.switch.get_state() 
+        if state == None:
+            label.set_text( "N/A" )
+        elif state:
             label.set_text( "Il riscaldamento è ACCESO" )
         else:
             label.set_text( "Il riscaldamento è SPENTO" )
